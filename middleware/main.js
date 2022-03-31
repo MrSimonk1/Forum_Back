@@ -20,4 +20,9 @@ module.exports = {
         }
         next();
     },
+    validateIsLoggedIn: async (req, res, next) => {
+        const {username} = req.session;
+        if (username) return next();
+        res.send({success: false, message: "Please log in"})
+    }
 }

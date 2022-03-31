@@ -23,9 +23,15 @@ module.exports = {
         if (findUser) {
             const compared = await bcrypt.compare(password, findUser.password);
             if (compared) {
+                req.session.username = username;
                 return res.send({success: true, message: "Logged in"})
             }
         }
         res.send({success: false, message: "Username and/or password is incorrect"});
+    },
+    userProfileInfo: async (req, res) => {
+        const {username} = req.session;
+        const user = await forumUserModel.findOne({username}, {image: true, username: true});
+        res.send({success: true, user});
     }
 }
