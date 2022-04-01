@@ -1,0 +1,31 @@
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
+
+const forumTopicSchema = new Schema({
+    title: {
+        type: String,
+        required: true
+    },
+    createdBy: {
+        type: String,
+        required: true
+    },
+    createdDate: {
+        type: Number,
+        default: Date.now()
+    },
+    commentsCount: {
+        type: Number,
+        default: 0
+    },
+    latestCommentBy: {
+        type: String,
+        required: true
+    },
+    latestCommentDate: {
+        type: Number,
+        required: true
+    }
+})
+
+module.exports = mongoose.model("ForumTopicModel", forumTopicSchema);

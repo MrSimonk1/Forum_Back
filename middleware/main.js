@@ -1,4 +1,5 @@
 const forumUserModel = require("../schemas/forumUserSchema");
+const forumTopicModel = require("../schemas/forumTopicSchema");
 
 module.exports = {
     registerValidator: async (req, res, next) => {
@@ -24,5 +25,23 @@ module.exports = {
         const {username} = req.session;
         if (username) return next();
         res.send({success: false, message: "Please log in"})
+    },
+    validateTopicTitle: async (req, res, next) => {
+        const {title, comment} = req.body;
+        const findTopic = await forumTopicModel.findOne({title});
+        if (findTopic) {
+            return res.send({success: false, message: "Topic name already exists"});
+        }
+        if (title.length < 10 || title.length > 50) {
+            return res.send({success: false, message: "Title length should be 10-50 symbols"});
+        }
+        next();
+    },
+    validateComment: async (req, res, next) => {
+        const {comment} = req.body;
+        if (comment.length < 1 || comment.length > 500) {
+            return res.send({success: false, message: "Comment length should be 1-500 symbols"});
+        }
+        next(); 
     }
 }
