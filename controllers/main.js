@@ -75,5 +75,20 @@ module.exports = {
         com.save();
 
         res.send({success: true, message: "Created topic and the firs comment"});
+    },
+    getOneTopic: async (req, res) => {
+        const {id} = req.params;
+        const topic = await forumTopicModel.findOne({_id: id});
+        res.send({success: true, topic});
+    },
+    getCommentsOfOneTopic: async (req, res) => {
+        const {id} = req.params;
+        const comments = await forumCommentModel.find({topicCommented: id}).limit(10).sort({commentDate: -1});
+        res.send({success: true, comments});
+    },
+    getCommenterInfo: async (req, res) => {
+        const {username} = req.body;
+        const user = await forumUserModel.findOne({username});
+        res.send({success: true, user});
     }
 }
