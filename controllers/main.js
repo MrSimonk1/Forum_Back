@@ -103,7 +103,7 @@ module.exports = {
             const topics = await forumTopicModel.find({createdBy: username}).skip(Number(page) * 10 - 10).limit(10).sort({createdDate: -1});
             const count = await forumTopicModel.find({createdBy: username}).count();
             res.send({success: true, topics, count});
-        }
+        }      
     },
     initialComment: async (req, res) => {
         const {comment, topicId} = req.body;
@@ -142,10 +142,23 @@ module.exports = {
     },
     getCommentsOfOneUser: async (req, res) => {
         const {username} = req.session;
+        const {page} = req.params;
+        console.log(page);
 
-        const comments = await forumCommentModel.find({commentBy: username});
+        if (page === String(1)) {
+            const comments = await forumCommentModel.find({commentBy: username}).limit(10).sort({commentDate: -1});
+            const count = await forumCommentModel.find({commentBy: username}).count();
+            res.send({success: true, comments, count});
+        }
+        if (page !== String(1)) {
+            const comments = await forumCommentModel.find({commentBy: username}).skip(Number(page) * 10 - 10).limit(10).sort({commentDate: -1});
+            const count = await forumCommentModel.find({commentBy: username}).count();
+            res.send({success: true, comments, count});
+        }  
 
-        res.send({success: true, comments});
+
+
+        
     },
     getOneTopic: async (req, res) => {
         const {id} = req.params;
