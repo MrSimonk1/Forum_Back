@@ -155,10 +155,6 @@ module.exports = {
             const count = await forumCommentModel.find({commentBy: username}).count();
             res.send({success: true, comments, count});
         }  
-
-
-
-        
     },
     getOneTopic: async (req, res) => {
         const {id} = req.params;
@@ -167,8 +163,18 @@ module.exports = {
     },
     getCommentsOfOneTopic: async (req, res) => {
         const {id} = req.params;
-        const comments = await forumCommentModel.find({topicCommented: id});
-        res.send({success: true, comments});
+        const {page} = req.params;
+
+        if (page === String(1)) {
+            const comments = await forumCommentModel.find({topicCommented: id}).limit(10);
+            const count = await forumCommentModel.find({topicCommented: id}).count();
+            res.send({success: true, comments, count});
+        }
+        if (page !== String(1)) {
+            const comments = await forumCommentModel.find({topicCommented: id}).skip(Number(page) * 10 - 10).limit(10);
+            const count = await forumCommentModel.find({topicCommented: id}).count();
+            res.send({success: true, comments, count});
+        }          
     },
     getCommenterInfo: async (req, res) => {
         const {username} = req.body;

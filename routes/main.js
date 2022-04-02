@@ -16,6 +16,6 @@ router.get("/getTopics/:page", getTopics);
 router.get("/getTopicsOfOneUser/:page", validateIsLoggedIn, getAllTopicsOfOneUser);
 router.get("/getCommentsOfOneUser/:page", validateIsLoggedIn, getCommentsOfOneUser);
 router.get("/getOneTopic/:id", getOneTopic);
-router.get("/getCommentsOfOneTopic/:id", getCommentsOfOneTopic);
+router.get("/getCommentsOfOneTopic/:id/:page", getCommentsOfOneTopic);
 
 module.exports = router;
