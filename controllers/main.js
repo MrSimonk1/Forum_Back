@@ -20,6 +20,16 @@ module.exports = {
 
         res.send({success: true, message: "Succesfully registered"});
     },
+    checkLoggedIn: async (req, res) => {
+        const {username} = req.session;
+
+        if (username) {
+            return res.send({success: true, message: "You are logged in"});
+        }
+        if (!username) {
+            res.send({success: false, message: "You are not logged in"});
+        }
+    },
     login: async (req, res) => {
         const {username, password} = req.body;
         const findUser = await forumUserModel.findOne({username});
@@ -32,6 +42,10 @@ module.exports = {
             }
         }
         res.send({success: false, message: "Username and/or password is incorrect"});
+    },
+    logout: async (req, res) => {
+        req.session.destroy();
+        res.send({success: true, message: "Logged out"});
     },
     userProfileInfo: async (req, res) => {
         const {username} = req.session;
@@ -99,10 +113,24 @@ module.exports = {
 
         res.send({success: true, message: "Comment created"});
     },
+    getCommentsOfOneUser: async (req, res) => {
+        const {username} = req.session;
+
+        const comments = await forumCommentModel.find({commentBy: username});
+
+        res.send({success: true, comments});
+    },
     getOneTopic: async (req, res) => {
         const {id} = req.params;
         const topic = await forumTopicModel.findOne({_id: id});
         res.send({success: true, topic});
+    },
+    getAllTopicsOfOneUser: async (req, res) => {
+        const {username} = req.session;
+
+        const topics = await forumTopicModel.find({createdBy: username});
+
+        res.send({success: true, topics});
     },
     getCommentsOfOneTopic: async (req, res) => {
         const {id} = req.params;
