@@ -75,8 +75,35 @@ module.exports = {
         res.send({success: true, message: "Topic was created", id});
     },
     getTopics: async (req, res) => {
-        const topics = await forumTopicModel.find({}).limit(10).sort({createdDate: -1});
-        res.send({success: true, topics});
+        const {page} = req.params;
+
+        if (page === String(1)) {
+            const topics = await forumTopicModel.find({}).limit(10).sort({createdDate: -1});
+            const count = await forumTopicModel.count();
+            res.send({success: true, topics, count});
+        }
+        if (page !== String(1)) {
+            const topics = await forumTopicModel.find({}).skip(Number(page) * 10 - 10).limit(10).sort({createdDate: -1});
+            const count = await forumTopicModel.count();
+            res.send({success: true, topics, count});
+        }
+
+    },
+    getAllTopicsOfOneUser: async (req, res) => {
+        const {page} = req.params;
+
+        const {username} = req.session;
+
+        if (page === String(1)) {
+            const topics = await forumTopicModel.find({createdBy: username}).limit(10).sort({createdDate: -1});
+            const count = await forumTopicModel.find({createdBy: username}).count();
+            res.send({success: true, topics, count});
+        }
+        if (page !== String(1)) {
+            const topics = await forumTopicModel.find({createdBy: username}).skip(Number(page) * 10 - 10).limit(10).sort({createdDate: -1});
+            const count = await forumTopicModel.find({createdBy: username}).count();
+            res.send({success: true, topics, count});
+        }
     },
     initialComment: async (req, res) => {
         const {comment, topicId} = req.body;
@@ -125,13 +152,6 @@ module.exports = {
         const topic = await forumTopicModel.findOne({_id: id});
         res.send({success: true, topic});
     },
-    getAllTopicsOfOneUser: async (req, res) => {
-        const {username} = req.session;
-
-        const topics = await forumTopicModel.find({createdBy: username});
-
-        res.send({success: true, topics});
-    },
     getCommentsOfOneTopic: async (req, res) => {
         const {id} = req.params;
         const comments = await forumCommentModel.find({topicCommented: id});
@@ -141,5 +161,5 @@ module.exports = {
         const {username} = req.body;
         const user = await forumUserModel.findOne({username});
         res.send({success: true, user});
-    }
+    },
 }
