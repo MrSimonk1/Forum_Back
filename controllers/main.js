@@ -71,10 +71,33 @@ module.exports = {
         com.topicCommented = topicId;
         com.commentBy = username;
         com.comment = comment;
+        com.commentDate = Date.now();
 
-        com.save();
+        await com.save();
 
         res.send({success: true, message: "Created topic and the firs comment"});
+    },
+    comment: async (req, res) => {
+        const {comment, topicId} = req.body;
+        const {username} = req.session;
+
+        const commentDate = Date.now();
+
+        const com = new forumCommentModel();
+        com.topicCommented = topicId;
+        com.commentBy = username;
+        com.comment = comment;
+        com.commentDate = commentDate;
+
+        await com.save();
+
+        const findUser = await forumUserModel.findOne({username});
+        await forumUserModel.findOneAndUpdate({username}, {$set: {totalComments: findUser.totalComments + 1}});
+
+        const findTopic = await forumTopicModel.findOne({_id: topicId});
+        await forumTopicModel.findOneAndUpdate({_id: topicId}, {$set: {commentsCount: findTopic.commentsCount + 1, latestCommentBy: username, latestCommentDate: commentDate}})
+
+        res.send({success: true, message: "Comment created"});
     },
     getOneTopic: async (req, res) => {
         const {id} = req.params;
@@ -83,7 +106,7 @@ module.exports = {
     },
     getCommentsOfOneTopic: async (req, res) => {
         const {id} = req.params;
-        const comments = await forumCommentModel.find({topicCommented: id}).limit(10).sort({commentDate: -1});
+        const comments = await forumCommentModel.find({topicCommented: id});
         res.send({success: true, comments});
     },
     getCommenterInfo: async (req, res) => {
