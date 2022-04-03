@@ -2,6 +2,7 @@ const forumUserModel = require("../schemas/forumUserSchema");
 const bcrypt = require("bcrypt");
 const forumTopicModel = require("../schemas/forumTopicSchema");
 const forumCommentModel = require("../schemas/forumCommentSchema");
+const forumNotificationModel = require("../schemas/forumNotificationSchema");
 
 module.exports = {
     register: async (req, res) => {
@@ -138,6 +139,17 @@ module.exports = {
         const findTopic = await forumTopicModel.findOne({_id: topicId});
         await forumTopicModel.findOneAndUpdate({_id: topicId}, {$set: {commentsCount: findTopic.commentsCount + 1, latestCommentBy: username, latestCommentDate: commentDate}})
 
+        if (findTopic.createdBy !== username) {
+            const notification = new forumNotificationModel();
+            notification.commentBy = username;
+            notification.topicCommented = findTopic._id;
+            notification.topicCreatedBy = findTopic.createdBy;
+            notification.commentedDate = Date.now();
+            notification.commentedTopicTitle = findTopic.title;
+
+            notification.save();
+        }
+
         res.send({success: true, message: "Comment created"});
     },
     getCommentsOfOneUser: async (req, res) => {
@@ -194,6 +206,20 @@ module.exports = {
             const count = await forumTopicModel.find({_id: array}).count();
             res.send({success: true, topics, count}); 
         }
+    },
+    getNotifications: async (req, res) => {
+        const {username} = req.session;
 
+        const notifications = await forumNotificationModel.find({topicCreatedBy: username}).sort({commentedDate: -1});
+        const notSeenCount = await forumNotificationModel.find({topicCreatedBy: username, isSeen: false}).count();
+
+        res.send({success: true, notifications, notSeenCount});
+    },
+    notificationsSeen: async (req, res) => {
+        const {username} = req.session;
+
+        await forumNotificationModel.updateMany({topicCreatedBy: username, isSeen: false}, {$set: {isSeen: true}});
+        
+        res.send({success: true, message: "All seen"});
     }
 }

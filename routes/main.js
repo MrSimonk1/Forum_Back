@@ -1,5 +1,5 @@
 const express = require("express");
-const {register, login, userProfileInfo, createTopic, getTopics, initialComment, getOneTopic, getCommentsOfOneTopic, getCommenterInfo, comment, checkLoggedIn, getAllTopicsOfOneUser, logout, getCommentsOfOneUser, getAllTopicsCount, getFavorites} = require("../controllers/main");
+const {register, login, userProfileInfo, createTopic, getTopics, initialComment, getOneTopic, getCommentsOfOneTopic, getCommenterInfo, comment, checkLoggedIn, getAllTopicsOfOneUser, logout, getCommentsOfOneUser, getAllTopicsCount, getFavorites, getNotifications, notificationsSeen} = require("../controllers/main");
 const {registerValidator, validateIsLoggedIn, validateComment, validateTopicTitle} = require("../middleware/main");
 const router = express.Router();
 
@@ -18,5 +18,7 @@ router.get("/getCommentsOfOneUser/:page", validateIsLoggedIn, getCommentsOfOneUs
 router.get("/getOneTopic/:id", getOneTopic);
 router.get("/getCommentsOfOneTopic/:id/:page", getCommentsOfOneTopic);
 router.post("/getFavorites", getFavorites);
+router.get("/getNotifications", validateIsLoggedIn, getNotifications);
+router.get("/seenNotification", validateIsLoggedIn, notificationsSeen);
 
 module.exports = router;
