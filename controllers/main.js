@@ -181,4 +181,19 @@ module.exports = {
         const user = await forumUserModel.findOne({username});
         res.send({success: true, user});
     },
+    getFavorites: async (req, res) => {
+        const {array, page} = req.body;
+
+        if (page === String(1)) {
+            const topics = await forumTopicModel.find({_id: array}).limit(10).sort({createdDate: -1});
+            const count = await forumTopicModel.find({_id: array}).count();
+            res.send({success: true, topics, count});
+        }
+        if (page !== String(1)) {
+            const topics = await forumTopicModel.find({_id: array}).skip(Number(page) * 10 - 10).limit(10).sort({createdDate: -1});
+            const count = await forumTopicModel.find({_id: array}).count();
+            res.send({success: true, topics, count}); 
+        }
+
+    }
 }
