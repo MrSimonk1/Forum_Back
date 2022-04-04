@@ -125,7 +125,11 @@ module.exports = {
 
         const commentDate = Date.now();
 
+        const findTopic = await forumTopicModel.findOne({_id: topicId});
+        await forumTopicModel.findOneAndUpdate({_id: topicId}, {$set: {commentsCount: findTopic.commentsCount + 1, latestCommentBy: username, latestCommentDate: commentDate}})
+
         const com = new forumCommentModel();
+        com.topicCommentedTitle = findTopic.title;
         com.topicCommented = topicId;
         com.commentBy = username;
         com.comment = comment;
@@ -135,9 +139,6 @@ module.exports = {
 
         const findUser = await forumUserModel.findOne({username});
         await forumUserModel.findOneAndUpdate({username}, {$set: {totalComments: findUser.totalComments + 1}});
-
-        const findTopic = await forumTopicModel.findOne({_id: topicId});
-        await forumTopicModel.findOneAndUpdate({_id: topicId}, {$set: {commentsCount: findTopic.commentsCount + 1, latestCommentBy: username, latestCommentDate: commentDate}})
 
         if (findTopic.createdBy !== username) {
             const notification = new forumNotificationModel();

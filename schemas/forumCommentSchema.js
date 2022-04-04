@@ -10,6 +10,10 @@ const forumCommentSchema = new Schema({
         type: String,
         required: true
     },
+    topicCommentedTitle: {
+        type: String,
+        required: true
+    },
     commentDate: {
         type: Number,
         default: Date.now(),
