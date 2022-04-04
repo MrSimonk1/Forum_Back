@@ -107,12 +107,13 @@ module.exports = {
         }      
     },
     initialComment: async (req, res) => {
-        const {comment, topicId} = req.body;
+        const {comment, topicId, title} = req.body;
         const {username} = req.session;
         const com = new forumCommentModel();
         com.topicCommented = topicId;
         com.commentBy = username;
         com.comment = comment;
+        com.topicCommentedTitle = title;
         com.commentDate = Date.now();
 
         await com.save();
