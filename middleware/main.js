@@ -43,5 +43,21 @@ module.exports = {
             return res.send({success: false, message: "Comment length should be 1-500 symbols"});
         }
         next(); 
+    },
+    validatePicture: async (req, res, next) => {
+        const {picture} = req.body;
+
+        if (picture.length === 0) {
+            return next();
+        }
+
+        if (picture.length > 0) {
+            if (picture.includes("jpeg") || picture.includes("jpg") || picture.includes("gif") || picture.includes("png")) {
+                return next();
+            }
+
+            res.send({success: false, message: "Wrong picture format."})
+        }
+
     }
 }

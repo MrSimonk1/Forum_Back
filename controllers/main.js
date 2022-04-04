@@ -6,15 +6,15 @@ const forumNotificationModel = require("../schemas/forumNotificationSchema");
 
 module.exports = {
     register: async (req, res) => {
-        const {username, passOne, image} = req.body;
+        const {username, passOne, picture} = req.body;
         const hash = await bcrypt.hash(passOne, 10);
 
         const user = new forumUserModel();
         user.username = username;
         user.password = hash;
         user.dateRegistration = Date.now();
-        if (image.length > 0) {
-            user.image = image
+        if (picture.length > 0) {
+            user.image = picture
         }
 
         user.save();
@@ -222,5 +222,15 @@ module.exports = {
         await forumNotificationModel.updateMany({topicCreatedBy: username, isSeen: false}, {$set: {isSeen: true}});
         
         res.send({success: true, message: "All seen"});
+    },
+    changePicture: async (req, res) => {
+        const {username} = req.session;
+        const {picture} = req.body;
+
+        if (picture.length !== 0) {
+            await forumUserModel.findOneAndUpdate({username}, {$set: {image: picture}})
+        }
+
+        res.send({success: true, message: "Picture updated"});
     }
 }
