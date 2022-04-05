@@ -118,6 +118,9 @@ module.exports = {
 
         await com.save();
 
+        const commenter = await forumUserModel.findOne({username});
+        await forumUserModel.findOneAndUpdate({username}, {$set: {totalComments: commenter.totalComments + 1}});
+
         res.send({success: true, message: "Created topic and the firs comment"});
     },
     comment: async (req, res) => {
