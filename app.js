@@ -41,3 +41,20 @@ const http = require("http").createServer(app);
 http.listen(4000, () => {
     console.log("port 4000")
 })
+
+const io = require("socket.io")(http, {
+    cors: {
+        origin: "http://localhost:3000"
+    }
+})
+
+const forumCommentModel = require("./schemas/forumCommentSchema");
+
+io.on("connection", socket => {
+
+    socket.on("getComments", async id => {
+        const comments = await forumCommentModel.find({topicCommented: id});
+        io.emit("setComments", comments);
+    })
+
+})
