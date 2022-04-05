@@ -62,6 +62,7 @@ module.exports = {
         topic.createdBy = username;
         topic.latestCommentBy = username;
         topic.latestCommentDate = Date.now();
+        topic.createdDate = Date.now();
 
         let id;
 
@@ -160,7 +161,6 @@ module.exports = {
     getCommentsOfOneUser: async (req, res) => {
         const {username} = req.session;
         const {page} = req.params;
-        console.log(page);
 
         if (page === String(1)) {
             const comments = await forumCommentModel.find({commentBy: username}).limit(10).sort({commentDate: -1});

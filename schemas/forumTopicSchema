@@ -12,7 +12,7 @@ const forumTopicSchema = new Schema({
     },
     createdDate: {
         type: Number,
-        default: Date.now()
+        required: true
     },
     commentsCount: {
         type: Number,
